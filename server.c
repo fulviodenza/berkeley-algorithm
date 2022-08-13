@@ -23,10 +23,11 @@ int main(int argc, char const *argv[])
     int *client_clocks = malloc(sizeof(int) * count_clients);
 
     struct sockaddr_in address;
-    int opt = 1;
     int addrlen = sizeof(address);
+
+    int opt = 1;
+
     char buffer[BUFFER_LEN];
-    char *hello = "Hello from server";
     int r = rand() % 10;
 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
@@ -60,7 +61,6 @@ int main(int argc, char const *argv[])
     printf("waiting for a client to connect...\n");
     while (true)
     {
-
         memset(buffer, '\0', BUFFER_LEN);
         while (count_clients < NUM_CLIENTS)
         {
@@ -94,10 +94,11 @@ int main(int argc, char const *argv[])
 
         for (int i = 0; i < count_clients; i++)
         {
-            send(client_socket[i], avg, strlen(hello), 0);
-            printf("hello message sent to client %s\n", avg);
-            printf("client disconnected\n");
+            send(client_socket[i], avg, strlen(avg), 0);
+            printf("%s message sent to client %d\n", avg, i);
+
             close(client_socket[i]);
+            printf("client disconnected\n");
         }
 
         free(avg);
