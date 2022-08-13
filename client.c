@@ -9,13 +9,16 @@
 
 int main(int argc, char const *argv[])
 {
-    int r = rand() % 10;
-    char *message = malloc(sizeof(char) * 1);
+    srand(time(NULL));
+    int r = rand() % 10 + 1;
+
+    char *message = malloc(sizeof(char) * 2);
     sprintf(message, "%d", r);
 
-    int sock = 0, valread, client_fd;
+    int sock = 0,
+        valread, client_fd;
     struct sockaddr_in serv_addr;
-    char buffer[1024] = {0};
+    char buffer[BUFFER_LEN];
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         printf("\n Socket creation error \n");
@@ -42,7 +45,7 @@ int main(int argc, char const *argv[])
     }
     send(sock, message, strlen(message), 0);
     printf("message %s sent\n", message);
-    valread = read(sock, buffer, 1024);
+    valread = read(sock, buffer, BUFFER_LEN);
     printf("%s\n", buffer);
 
     // closing the connected socket

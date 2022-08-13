@@ -3,18 +3,29 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "config.h"
 
+#define EXTEND(array, number) realloc(array, sizeof(int) * number)
+
+int calculate_average(int *clocks, int clocks_len, int server_clock);
+
 int main(int argc, char const *argv[])
 {
+    srand(time(NULL));
+
     int server_fd, new_socket, valread;
+
+    int count_clients = 0;
+    int *client_socket = malloc(sizeof(int) * count_clients);
+    int *client_clocks = malloc(sizeof(int) * count_clients);
+
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
-    char buffer[1024];
+    char buffer[BUFFER_LEN];
     char *hello = "Hello from server";
     int r = rand() % 10;
 
@@ -46,28 +57,64 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     }
 
-    printf("waiting for a client to connect...");
+    printf("waiting for a client to connect...\n");
     while (true)
     {
-        if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
-                                 (socklen_t *)&addrlen)) < 0)
+
+        memset(buffer, '\0', BUFFER_LEN);
+        while (count_clients < NUM_CLIENTS)
         {
-            perror("accept");
-            exit(EXIT_FAILURE);
+            if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
+                                     (socklen_t *)&addrlen)) < 0)
+            {
+                perror("accept");
+                exit(EXIT_FAILURE);
+            }
+
+            printf("connection accept\n");
+
+            count_clients++;
+            client_socket = EXTEND(client_socket, count_clients);
+            client_clocks = EXTEND(client_clocks, count_clients);
+
+            client_socket[count_clients - 1] = new_socket;
         }
 
-        printf("connection accept");
+        for (int i = 0; i < count_clients; i++)
+        {
+            valread = read(client_socket[i], buffer, BUFFER_LEN);
+            printf("message payload: %s\n", buffer);
 
-        valread = read(new_socket, buffer, 1024);
-        printf("%s\n", buffer);
-        send(new_socket, hello, strlen(hello), 0);
-        printf("hello message sent\n");
+            int n = atoi(buffer);
+            client_clocks[i] = n;
+        }
 
-        printf("client disconnected\n");
-        // closing the connected socket
-        close(new_socket);
+        char *avg = calloc(BUFFER_LEN, sizeof(char));
+        snprintf(avg, BUFFER_LEN, "%d", calculate_average(client_clocks, count_clients, r));
+
+        for (int i = 0; i < count_clients; i++)
+        {
+            send(client_socket[i], avg, strlen(hello), 0);
+            printf("hello message sent to client %s\n", avg);
+            printf("client disconnected\n");
+            close(client_socket[i]);
+        }
+
+        free(avg);
+        count_clients = 0;
     }
 
     printf("closing server\n");
     shutdown(server_fd, SHUT_RDWR);
+}
+
+int calculate_average(int *clocks, int clocks_len, int server_clock)
+{
+    double avg = 0;
+    for (int i = 0; i < clocks_len; i++)
+    {
+        avg += clocks[i];
+    }
+
+    return avg / clocks_len;
 }
