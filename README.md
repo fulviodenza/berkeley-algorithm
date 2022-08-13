@@ -19,8 +19,8 @@ The master calculates the average of all the timestamps that it has received, in
 
 ### Server Polling
 
-packet_type = 0x00
-window_id = 32 bit uint little endian
+- packet_type = 0x00
+- window_id = 32 bit uint little endian
 
 ```
 +-------------+-----------+
@@ -30,9 +30,9 @@ window_id = 32 bit uint little endian
 
 ### Client Polling Response
 
-packet_type = 0x01
-window_id = 32 bit uint little endian
-clock = 64 bit little endian
+- packet_type = 0x01
+- window_id = 32 bit uint little endian
+- clock = 64 bit little endian
 
 ```
 +-------------+-----------+-------+
@@ -42,10 +42,10 @@ clock = 64 bit little endian
 
 ### Server Sync Clock
 
-packet_type = 0x69
-window_id = 32 bit uint little endian
-s = 0x00 or 0x01
-adjustment = 32 bit uint little endian
+- packet_type = 0x69
+- window_id = 32 bit uint little endian
+- s = 0x00 or 0x01
+- adjustment = 32 bit uint little endian
 
 ```
 +-------------+-----------+---+------------+
