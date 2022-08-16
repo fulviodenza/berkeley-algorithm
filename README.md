@@ -55,6 +55,6 @@ The master calculates the average of all the timestamps that it has received, in
 
 ## Future additional features
 
-[x] RTT calculation: the Round Trip Time can be taken into account for the average of the timestamps
-[x] UDP protocol: use UDP to reduce the overhead
-[x] Master election: Fault Tolerance
+-[ ] RTT calculation: the Round Trip Time can be taken into account for the average of the timestamps
+-[ ] UDP protocol: use UDP to reduce the overhead
+-[ ] Master election: Fault Tolerance
